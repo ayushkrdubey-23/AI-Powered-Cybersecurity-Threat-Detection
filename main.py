@@ -3,18 +3,17 @@
 Entry point for the AI-Powered Cybersecurity Threat Detection System.
 
 Current workflow:
-- Load saved training transformations and the Random Forest classifier.
-- Run offline dataset replay.
-- Generate model predictions and threat alerts.
-- Save detection records and an alert summary.
+- Load evaluation and offline detection results.
+- Generate security performance visualizations.
+- Save the graphs to outputs/visualizations/.
 """
 
-from src.threat_detection import main as run_threat_detection
+from src.visualization import main as run_visualization
 
 
 def main() -> int:
-    """Start the offline threat detection workflow."""
-    return run_threat_detection()
+    """Start the visualization workflow."""
+    return run_visualization()
 
 
 if __name__ == "__main__":
