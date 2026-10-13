@@ -3,18 +3,18 @@
 Entry point for the AI-Powered Cybersecurity Threat Detection System.
 
 Current workflow:
-- Load and clean the training dataset.
-- Engineer numerical and categorical features.
-- Train Logistic Regression and Random Forest.
-- Save the fitted preprocessing transformer and trained models.
+- Load the held-out testing dataset.
+- Apply the saved preprocessing transformer.
+- Evaluate previously trained classifiers.
+- Save evaluation metrics, reports, confusion matrices, and predictions.
 """
 
-from src.model_training import main as run_model_training
+from src.model_evaluation import main as run_model_evaluation
 
 
 def main() -> int:
-    """Start model training."""
-    return run_model_training()
+    """Start independent model evaluation."""
+    return run_model_evaluation()
 
 
 if __name__ == "__main__":
