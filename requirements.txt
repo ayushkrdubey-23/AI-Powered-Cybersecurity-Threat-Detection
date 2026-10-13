@@ -14,8 +14,7 @@ seaborn>=0.13,<1.0
 # Interactive dashboard
 streamlit>=1.40,<2.0
 
-# Notebook support
-jupyter>=1.1,<2.0
+# Python notebook kernel (without the full JupyterLab bundle)
 ipykernel>=6.29,<8.0
 
 # Testing
