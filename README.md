@@ -1,55 +1,73 @@
 
 # AI-Powered Cybersecurity Threat Detection System
 
-A machine-learning-based defensive cybersecurity project that analyzes network traffic records, classifies potential attacks, generates security alerts, and visualizes detection results through an interactive dashboard.
+[![Python CI](https://github.com/ayushkrdubey-23/AI-Powered-Cybersecurity-Threat-Detection/actions/workflows/tests.yml/badge.svg)](https://github.com/ayushkrdubey-23/AI-Powered-Cybersecurity-Threat-Detection/actions/workflows/tests.yml)
 
-The project uses the public **UNSW-NB15 network intrusion detection dataset** and an offline dataset-replay workflow. It does not require access to a corporate network or production security infrastructure.
+A machine-learning-based defensive cybersecurity project that analyzes public network traffic data, identifies records resembling known attacks, generates severity-ranked alerts, and presents evaluation results in an interactive Streamlit dashboard.
+
+**Primary dataset:** UNSW-NB15  
+**Primary models:** Logistic Regression and Random Forest  
+**Mode:** Offline dataset replay and virtual threat simulation
+
+This is an educational project. It does not require access to a corporate network and does not perform live traffic capture or automated blocking.
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Features](#features)
+- [Technology Stack](#technology-stack)
+- [Architecture](#architecture)
+- [Dataset](#dataset)
+- [Repository Structure](#repository-structure)
+- [Installation](#installation)
+- [Execution Guide](#execution-guide)
+- [Evaluation Metrics](#evaluation-metrics)
+- [Threat Detection and Severity](#threat-detection-and-severity)
+- [Visual Results](#visual-results)
+- [Automated Testing](#automated-testing)
+- [Limitations](#limitations)
+- [Learning Outcomes](#learning-outcomes)
+- [Future Improvements](#future-improvements)
+- [Dataset Citation](#dataset-citation)
 
 ## Project Overview
 
 ### Problem Statement
 
-Network environments generate large volumes of traffic records. Reviewing every record manually can be difficult, and security analysts need ways to prioritize suspicious activity.
+Network environments can generate large volumes of traffic records. Reviewing all records manually can be difficult, so cybersecurity teams use detection and prioritization systems to help identify activity that deserves investigation.
 
-This project explores how machine learning can support network intrusion detection by distinguishing normal traffic from traffic that resembles known attacks.
+This project explores how supervised machine learning can distinguish normal network traffic from traffic labelled as malicious in a public research dataset.
 
 ### Objectives
 
-- Load and inspect a public network intrusion detection dataset.
-- Clean and preprocess network traffic records.
-- Transform numerical and categorical traffic features.
+- Load and inspect public network intrusion data.
+- Clean and validate data before model training.
+- Engineer numerical and categorical traffic features.
 - Train and compare Logistic Regression and Random Forest classifiers.
-- Evaluate models with accuracy, precision, recall, F1 score, balanced accuracy, and false-positive rate.
-- Generate model-based attack scores and severity-ranked alerts.
-- Visualize evaluation results and detection activity.
-- Provide an interactive Streamlit dashboard.
-- Maintain reproducible source code, tests, and Git checkpoints.
+- Evaluate model predictions using classification metrics.
+- Generate attack scores and severity-ranked alerts.
+- Visualize performance, scores, protocols, and feature importance.
+- Provide a dashboard for examining detection results.
+- Document the development process and automate unit tests.
 
-### Project Scope
+## Features
 
-The current implementation focuses on **binary network intrusion detection**:
-
-- `0`: Normal traffic
-- `1`: Attack traffic
-
-Phishing email classification, malware-file detection, financial fraud detection, and live network monitoring are separate capabilities. This project does not claim to implement them.
-
-## Key Features
-
-- Dataset loading and initial inspection
-- Missing-value and label validation
-- Numerical feature imputation and standardization
-- Categorical feature encoding
-- Logistic Regression baseline classifier
-- Random Forest classifier
+- Dataset loading and data-quality summaries
+- Missing-value and target-label validation
+- Numerical imputation and standardization
+- Categorical imputation and one-hot encoding
+- Logistic Regression and Random Forest model training
 - Independent testing-set evaluation
 - Confusion matrices and classification reports
 - Offline threat scoring and alert generation
-- Low, Medium, and High severity categories
-- CSV and JSON output reports
-- Security analytics visualizations
-- Streamlit dashboard with filtering and downloadable reports
-- Pytest automated tests
+- Low, Medium, and High alert severity
+- CSV and JSON reporting
+- Reproducible offline simulation
+- Streamlit dashboard with filters and downloads
+- Automated testing using Pytest
+- GitHub Actions continuous integration
+
+The current classifier handles binary network intrusion detection. Phishing email analysis, malware-file detection, financial fraud detection, and live network monitoring are separate capabilities and are not claimed as implemented.
 
 ## Technology Stack
 
@@ -58,78 +76,72 @@ Phishing email classification, malware-file detection, financial fraud detection
 | Programming language | Python |
 | Data processing | Pandas, NumPy |
 | Machine learning | Scikit-learn |
+| Models | Logistic Regression, Random Forest |
 | Model persistence | Joblib |
 | Visualization | Matplotlib, Seaborn |
 | Dashboard | Streamlit |
-| Testing | Pytest |
-| Dataset format | CSV |
+| Automated testing | Pytest |
+| Dataset | UNSW-NB15 CSV files |
 | Version control | Git and GitHub |
+| Continuous integration | GitHub Actions |
 
-## System Architecture
+A GPU is not required for the current implementation.
+
+## Architecture
 
 ```text
-             UNSW-NB15 Dataset
-                      |
-                      v
-             Dataset Loader
-                      |
-                      v
-          Data Cleaning and Validation
-                      |
-                      v
-              Feature Separation
-                      |
-                      v
-       Numerical and Categorical Pipeline
-          |                           |
-          v                           v
-     Median Imputation          One-Hot Encoding
-     Standardization
-          |                           |
-          +-------------+-------------+
-                        |
-                        v
-             Fitted Feature Transformer
-                        |
-                        v
-              Machine-Learning Models
-              /                     \
-             v                       v
-      Logistic Regression       Random Forest
-              \                     /
-               \                   /
-                v                 v
-               Independent Evaluation
-                        |
-                        v
-          Metrics and Confusion Matrices
-                        |
-                        v
-              Offline Threat Detection
-                        |
-                        v
-               Severity-Based Alerts
-                        |
-                        v
-             Reports and Visualizations
-                        |
-                        v
-                 Streamlit Dashboard
+Public UNSW-NB15 Dataset
+           |
+           v
+    Dataset Loader
+           |
+           v
+ Data Cleaning and Validation
+           |
+           v
+ Feature and Target Separation
+           |
+           v
+    Feature Engineering
+  Numerical      Categorical
+ Imputation      Imputation
+ Scaling         One-Hot Encoding
+           |
+           v
+   Fitted Preprocessing Pipeline
+           |
+           v
+ Logistic Regression / Random Forest
+           |
+           v
+ Independent Model Evaluation
+           |
+           v
+  Metrics and Confusion Matrices
+           |
+           v
+ Offline Threat Scoring and Alerts
+           |
+           v
+ Reports and Visualization Graphs
+           |
+           v
+     Streamlit Dashboard
 ```
 
-The preprocessing and machine-learning modules are separated so that transformations can be fitted using training data and reused during inference.
+The fitted preprocessing transformer is reused for testing and prediction. The independent testing dataset is not used to fit the preprocessing steps or retrain the models.
 
 ## Dataset
 
-### UNSW-NB15
-
-The project uses the prepared UNSW-NB15 training and testing CSV files.
+### UNSW-NB15 Network Intrusion Detection Dataset
 
 Official source:
 
 https://research.unsw.edu.au/projects/unsw-nb15-dataset
 
-Expected local structure:
+Download the prepared training and testing CSV files from the official source, following the dataset provider's instructions.
+
+Place the files directly inside `data/`:
 
 ```text
 data/
@@ -137,57 +149,57 @@ data/
 └── UNSW_NB15_testing-set.csv
 ```
 
-The dataset includes normal network traffic and multiple attack categories.
+Important fields include:
 
-Download and extract the prepared CSV files according to the provider's instructions. Place them in `data/` using the exact filenames shown above.
+- `label`: binary target, where 0 represents normal traffic and 1 represents attack traffic
+- `attack_cat`: descriptive attack category, where available
+- `id`: a record identifier
+- Traffic features such as protocol, duration, connection state, packet counts, and byte counts
 
-The initial implementation uses the following fields where available:
+The precise columns are validated by the code.
 
-- `label`: binary normal/attack target
-- `attack_cat`: descriptive attack category
-- `id`: record identifier
-- Network traffic fields such as protocol, duration, packet counts, byte counts, and connection state
+### Dataset handling principles
 
-The exact columns are inspected at runtime.
+- Keep original dataset files unchanged.
+- Exclude target labels and record identifiers from predictive features.
+- Fit imputation, scaling, and encoding on training data only.
+- Evaluate the fitted models on the prepared testing dataset.
+- Do not commit raw dataset files without checking their terms and repository size.
+- Do not interpret dataset labels as confirmation of attacks on a live network.
 
-### Dataset Handling
-
-- Original CSV files are kept separate from generated outputs.
-- The target label is excluded from model input features.
-- Attack-category descriptions and record identifiers are excluded from the initial binary classifier's predictive features.
-- Feature transformations are fitted on training data only.
-- Model evaluation uses the prepared testing dataset.
-- Raw datasets are excluded from Git by `.gitignore`.
-
-Consult `docs/dataset_guide.md` for dataset acquisition and handling details.
+See [`docs/dataset_guide.md`](docs/dataset_guide.md) for detailed acquisition and handling instructions.
 
 ## Repository Structure
 
 ```text
 AI-Powered-Cybersecurity-Threat-Detection/
 │
+├── .github/
+│   └── workflows/
+│       └── tests.yml
+│
 ├── app/
 │   ├── __init__.py
 │   └── dashboard.py
 │
-├── data/
-│   └── .gitkeep
+├── data/                         # Local dataset files; not committed
 │
 ├── docs/
 │   ├── architecture.md
 │   ├── dataset_guide.md
-│   └── project_plan.md
+│   ├── project_plan.md
+│   ├── proof_of_work.md
+│   ├── release_checklist.md
+│   ├── github_publication.md
+│   └── final_verification.md
 │
-├── images/
-│   └── .gitkeep
+├── images/                       # Selected visual evidence
 │
-├── models/
-│   └── Local model artifacts are generated here
+├── models/                       # Locally generated model artifacts
 │
-├── notebooks/
+├── notebooks/                    # Optional exploratory notebooks
 │
-├── outputs/
-│   └── Generated reports and graphs
+├── outputs/                      # Generated reports and graphs
 │
 ├── src/
 │   ├── __init__.py
@@ -197,7 +209,8 @@ AI-Powered-Cybersecurity-Threat-Detection/
 │   ├── model_training.py
 │   ├── model_evaluation.py
 │   ├── threat_detection.py
-│   └── visualization.py
+│   ├── visualization.py
+│   └── simulation.py
 │
 ├── tests/
 │   ├── test_preprocessing.py
@@ -210,67 +223,44 @@ AI-Powered-Cybersecurity-Threat-Detection/
 └── README.md
 ```
 
-Generated model files and output reports are stored locally and are not necessarily tracked by Git. Refer to `.gitignore` before publishing artifacts.
-
-## Requirements
-
-- Python 3.11 or 3.12 recommended
-- Git
-- Visual Studio Code or another Python editor
-- Internet connection for installing packages and downloading the dataset
-- Sufficient RAM to process the prepared CSV files and train the models
-
-A GPU is not required for the current implementation.
+The `data/`, `models/`, and `outputs/` directories contain local or generated files. Some directories may appear only after the relevant workflow runs or files have been added.
 
 ## Installation
 
 ### 1. Clone the repository
 
-After publishing the project to GitHub, clone it with:
-
 ```powershell
-git clone https://github.com/YOUR-GITHUB-USERNAME/AI-Powered-Cybersecurity-Threat-Detection.git
+git clone https://github.com/ayushkrdubey-23/AI-Powered-Cybersecurity-Threat-Detection.git
 cd AI-Powered-Cybersecurity-Threat-Detection
 ```
 
-Replace `YOUR-GITHUB-USERNAME` with the actual GitHub username.
+### 2. Create and activate the virtual environment
 
-If you are already working in the project directory, skip cloning.
-
-### 2. Create the virtual environment
-
-Windows PowerShell:
+Recommended Python version: 3.12.
 
 ```powershell
 python -m venv .venv
 ```
 
-Activate it:
+Activate it in Windows PowerShell:
 
 ```powershell
 .\.venv\Scripts\Activate.ps1
 ```
-
-If activation is blocked by PowerShell policy, use an appropriate process-scoped workaround rather than changing system-wide settings.
 
 ### 3. Install dependencies
 
 ```powershell
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
-```
-
-Verify dependency compatibility:
-
-```powershell
 python -m pip check
 ```
 
 ### 4. Download the dataset
 
-Obtain the prepared training and testing CSV files from the official UNSW-NB15 dataset source and place them in `data/`.
+Download and extract the two prepared UNSW-NB15 CSV files from the official dataset source.
 
-Confirm that the files exist:
+Verify the files in PowerShell:
 
 ```powershell
 Test-Path .\data\UNSW_NB15_training-set.csv
@@ -279,19 +269,23 @@ Test-Path .\data\UNSW_NB15_testing-set.csv
 
 Both commands should return `True`.
 
-## How to Run
+## Execution Guide
 
-Run the commands from the project root with the virtual environment activated.
+Run all commands from the project root with the virtual environment active.
 
-### 1. Train the models
+### 1. Run the automated tests
+
+```powershell
+python -m pytest -v
+```
+
+### 2. Train the models
 
 ```powershell
 python -m src.model_training
 ```
 
-This command fits the preprocessing transformer and trains the Logistic Regression and Random Forest classifiers.
-
-Generated local artifacts:
+The training process creates these local artifacts:
 
 ```text
 models/
@@ -300,92 +294,63 @@ models/
 └── random_forest.joblib
 ```
 
-### 2. Evaluate the models
+The model artifacts are generated by the training code and are not committed by default.
+
+### 3. Evaluate the models
 
 ```powershell
 python -m src.model_evaluation
 ```
 
-This command applies the saved transformer to the independent testing dataset and produces model metrics, confusion matrices, and prediction reports.
+This produces actual testing-set metrics, classification reports, confusion matrices, and row-level predictions.
 
-### 3. Run the offline threat detection simulation
+### 4. Run offline threat detection
 
 ```powershell
 python -m src.threat_detection
 ```
 
-The Random Forest model generates attack scores and predicted classifications for the prepared testing records.
+The Random Forest classifier generates attack scores and alert records from the prepared testing data.
 
-Generated local outputs include:
+### 5. Run the reproducible simulation
 
-```text
-outputs/
-├── detection_results.csv
-├── threat_alerts.csv
-└── detection_summary.json
+```powershell
+python -m src.simulation --samples-per-class 50
 ```
 
-### 4. Generate visualizations
+This selects a reproducible sample of normal and attack records for demonstration and post-prediction assessment. Its metrics apply to the selected sample, not to real-world attack prevalence.
+
+### 6. Generate visualizations
 
 ```powershell
 python -m src.visualization
 ```
 
-Generated visualization files are saved to:
+The generated graphs are saved under `outputs/visualizations/`.
 
-```text
-outputs/visualizations/
-```
-
-### 5. Run the interactive dashboard
+### 7. Launch the Streamlit dashboard
 
 ```powershell
 python -m streamlit run app/dashboard.py
 ```
 
-Open the local URL printed by Streamlit, typically:
+Open the local URL printed by Streamlit, normally:
 
 http://localhost:8501
 
-The dashboard reads the reports generated by the earlier commands. It does not retrain the models automatically.
+The dashboard reads the saved evaluation and detection reports. It does not train models automatically.
 
-### 6. Run the project entry point
+### 8. Run the root entry point
 
 ```powershell
 python main.py
 ```
 
-The current root entry point runs the visualization workflow. Use the dedicated module commands above when training, evaluating, or performing detection.
-
-## Automated Testing
-
-Run the test suite:
-
-```powershell
-python -m pytest -v
-```
-
-Run syntax checks:
-
-```powershell
-python -m compileall -q main.py src app tests
-```
-
-The automated tests cover:
-
-- Dataset preprocessing and target validation
-- Separation of features and labels
-- Handling of missing numerical and categorical values
-- Encoding of previously unseen categories
-- Detection-score interpretation
-- Alert severity thresholds
-- Detection report generation
-
-The synthetic unit tests do not replace evaluation on the actual UNSW-NB15 testing dataset.
+The current root entry point invokes the visualization workflow. Use the dedicated module commands above to run training, evaluation, simulation, and detection separately.
 
 ## Evaluation Metrics
 
-The project reports:
+The system reports:
 
 - Accuracy
 - Precision for the attack class
@@ -395,21 +360,21 @@ The project reports:
 - False-positive rate
 - Confusion matrix
 
-Accuracy measures the proportion of correct predictions.
+Accuracy describes the proportion of correct predictions.
 
-Attack precision measures how many predicted attacks were actually labelled as attacks in the testing dataset.
+Attack precision measures the proportion of predicted attacks that match attack labels in the evaluated dataset.
 
-Attack recall measures how many labelled attacks the model detected.
+Attack recall measures how many attack-labelled records are detected.
 
-The false-positive rate measures the proportion of labelled normal records incorrectly predicted as attacks.
+The false-positive rate measures the proportion of normal-labelled records incorrectly classified as attacks.
 
-No metric values are stated here because they must be generated from the actual local model run.
+Actual metrics must be taken from generated experiment results. No performance values are assumed in advance.
 
-## Detection and Alert Logic
+## Threat Detection and Severity
 
-The offline detection module uses the Random Forest model's class-1 output to produce attack scores.
+The offline threat detection module uses the Random Forest model's class-1 output as an attack score.
 
-The demonstration thresholds are:
+Configured demonstration thresholds:
 
 | Score | Result |
 |---|---|
@@ -418,119 +383,104 @@ The demonstration thresholds are:
 | 0.65 to below 0.85 | Medium |
 | 0.85 and above | High |
 
-These thresholds are configurable project heuristics. They have not been validated as production security policies.
+These thresholds are configurable project heuristics, not validated production security policies.
 
-A model score is not automatically a calibrated probability of a real compromise. A generated alert should be treated as an event for investigation, not as confirmed proof of malicious activity.
+A model score is not automatically a calibrated probability that a system has been compromised. A generated alert requires investigation and corroborating evidence.
 
-## Generated Outputs
+The system does not block traffic or perform automated incident response.
 
-Depending on which commands have been executed successfully, `outputs/` may contain:
+## Visual Results
 
-```text
-outputs/
-├── classification_report.txt
-├── confusion_matrix_logistic_regression.png
-├── confusion_matrix_random_forest.png
-├── model_comparison.csv
-├── evaluation_results.json
-├── predictions.csv
-├── detection_results.csv
-├── threat_alerts.csv
-├── detection_summary.json
-└── visualizations/
-    ├── model_metrics_comparison.png
-    ├── alert_severity_distribution.png
-    ├── attack_score_distribution.png
-    ├── protocol_alert_counts.png
-    └── random_forest_feature_importance.png
+The following images are intended to show actual results generated by the project:
+
+### Model performance
+
+![Model performance comparison](images/model_metrics_comparison.png)
+
+### Random Forest confusion matrix
+
+![Random Forest confusion matrix](images/confusion_matrix_random_forest.png)
+
+### Alert severity
+
+![Alert severity distribution](images/alert_severity_distribution.png)
+
+### Attack-score distribution
+
+![Attack-score distribution](images/attack_score_distribution.png)
+
+### Feature importance
+
+![Random Forest feature importance](images/random_forest_feature_importance.png)
+
+If a graph does not appear on GitHub, verify that the corresponding PNG file exists in `images/` and has been committed.
+
+## Automated Testing and Continuous Integration
+
+Run the unit tests locally:
+
+```powershell
+python -m pytest -v
 ```
 
-Not all files exist immediately after installation. Generate the corresponding outputs by completing the required pipeline stages.
+Check Python syntax:
 
-## Screenshots and Demonstration
-
-Place selected project screenshots in `images/`.
-
-Recommended evidence:
-
-1. Dataset inspection output
-2. Preprocessing and feature engineering summary
-3. Successful model training output
-4. Evaluation metrics and confusion matrices
-5. Threat alert preview
-6. Generated visualization graphs
-7. Running Streamlit dashboard
-8. Successful Pytest results
-9. GitHub repository overview
-
-When screenshots are captured, include them here using Markdown image links. For example:
-
-```markdown
-![Cybersecurity dashboard](images/dashboard_overview.png)
+```powershell
+python -m compileall -q main.py src app tests
 ```
 
-Only include screenshots that actually exist in the repository.
+The repository also contains a GitHub Actions workflow at `.github/workflows/tests.yml`.
 
-## Security and Research Limitations
+The workflow installs dependencies, checks Python syntax, and runs the tests when triggered by a push or pull request targeting `main`. The status badge at the top of this README links to the workflow history.
 
-- The project processes an offline public dataset rather than live network traffic.
-- Predictions depend on the dataset, its labels, feature selection, and model training process.
-- The model can produce false positives and false negatives.
-- The detection score is not guaranteed to be calibrated.
-- An alert does not confirm an incident.
-- The dashboard does not block connections or execute automated remediation.
-- The current implementation does not independently detect arbitrary malware files, phishing emails, or financial fraud.
-- Generated Joblib artifacts should only be loaded from trusted sources.
-- Raw datasets should not be redistributed without reviewing the provider's terms.
+## Limitations
 
-This is an educational defensive analytics project, not a replacement for an enterprise SIEM, intrusion prevention system, or professional incident-response process.
+- The implementation processes an offline public dataset.
+- It does not capture live network packets or monitor production infrastructure.
+- Model predictions can produce false positives and false negatives.
+- A predicted attack is not proof of a confirmed security incident.
+- Attack scores should not be interpreted as calibrated compromise probabilities.
+- The current system does not independently classify arbitrary malware files, phishing emails, or financial fraud.
+- Detection thresholds require further evaluation before any operational use.
+- Serialized Joblib artifacts should only be loaded from trusted sources.
+
+This is an educational defensive analytics project, not a replacement for an enterprise SIEM, intrusion prevention system, or professional incident-response workflow.
 
 ## Learning Outcomes
 
-Through this project, the developer practices:
+This project demonstrates practical experience with:
 
-- Preparing and validating cybersecurity datasets
-- Building supervised machine-learning pipelines
-- Preventing target leakage
-- Applying consistent preprocessing to unseen data
-- Evaluating binary classifiers
-- Understanding false positives and false negatives
-- Creating threshold-based security alerts
-- Visualizing security-related results
-- Building a Streamlit application
-- Writing automated tests
-- Using Git to document development stages
+- Cybersecurity dataset preparation
+- Supervised machine learning
+- Data preprocessing and feature engineering
+- Target-leakage prevention
+- Model evaluation and error analysis
+- Threat scoring and alert generation
+- Security visualization
+- Streamlit dashboard development
+- Automated unit testing
+- Git version control and GitHub Actions
 
 ## Future Improvements
 
-Potential extensions include:
-
-- Threshold tuning using validation data
-- Model calibration and additional evaluation
+- Validation-based threshold selection
+- Probability calibration
 - Multi-class attack-category classification
-- Anomaly detection with Isolation Forest
-- Additional supported cybersecurity datasets
+- Isolation Forest anomaly detection
+- Additional public cybersecurity datasets
 - Time-window aggregation and event correlation
-- Better explainability for individual alerts
-- A more advanced incident investigation workflow
-- CI testing through GitHub Actions
-- A reproducible experiment configuration
+- Individual-alert explainability
+- Expanded integration tests
+- Improved reproducibility and model-version tracking
 
-Future work should be documented separately from currently implemented features.
+Future improvements should be documented separately from implemented and tested functionality.
 
 ## Dataset Citation
 
-Consult the official UNSW-NB15 dataset documentation for the original research citation, usage terms, and attribution requirements:
+Consult the official UNSW-NB15 dataset documentation for the original research citation, dataset access, usage terms, and attribution requirements:
 
 https://research.unsw.edu.au/projects/unsw-nb15-dataset
 
-## License
+## Repository
 
-A repository license has not been selected automatically. Before publishing a license, verify that it is appropriate for your source code and does not conflict with dataset terms.
-
----
-
-**Project:** AI-Powered Cybersecurity Threat Detection System  
-**Mode:** Offline dataset-based defensive simulation  
-**Primary dataset:** UNSW-NB15  
-**Primary models:** Logistic Regression and Random Forest
+https://github.com/ayushkrdubey-23/AI-Powered-Cybersecurity-Threat-Detection
