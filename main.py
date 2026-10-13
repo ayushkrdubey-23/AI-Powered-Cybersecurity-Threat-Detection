@@ -4,126 +4,126 @@ Entry point for the AI-Powered Cybersecurity Threat Detection System.
 
 Current capabilities:
 - Load the prepared UNSW-NB15 datasets.
-- Inspect dataset quality.
-- Apply basic data cleaning and label validation.
+- Clean and validate the datasets.
 - Separate predictive features from target labels.
+- Engineer numerical and categorical features.
+- Validate the transformed training and testing matrices.
 """
 
 from src.data_loader import (
     TRAINING_PATH,
     TESTING_PATH,
     load_csv,
-    print_dataset_summary,
 )
 
 from src.preprocessing import (
     prepare_features_and_target,
     preprocess_dataset,
-    print_preprocessing_summary,
+)
+
+from src.feature_engineering import (
+    engineer_features,
+    print_feature_engineering_summary,
 )
 
 
-def inspect_dataset(dataset_name: str, file_path) -> list:
-    """
-    Load, inspect, and preprocess one dataset.
-
-    Returns the ordered predictive feature column names.
-    """
+def load_and_prepare_dataset(
+    dataset_name: str,
+    file_path,
+):
+    """Load, clean, and separate one dataset into features and labels."""
     print(f"\nLoading {dataset_name}...")
 
     original = load_csv(file_path)
-
-    print_dataset_summary(
-        dataframe=original,
-        dataset_name=f"{dataset_name} (before cleaning)",
-        file_path=file_path,
-    )
 
     cleaned = preprocess_dataset(
         original,
         dataset_name=dataset_name,
     )
 
-    print_preprocessing_summary(
-        dataframe_before=original,
-        dataframe_after=cleaned,
-        dataset_name=dataset_name,
-    )
+    # Avoid keeping unnecessary copies of the original DataFrame.
+    del original
 
     features, target = prepare_features_and_target(cleaned)
 
-    print("\nPrepared data dimensions:")
-    print(f"  Feature rows: {features.shape[0]:,}")
-    print(f"  Feature columns: {features.shape[1]:,}")
-    print(f"  Target records: {len(target):,}")
-
-    # Save only the column names, not another copy of the full dataset.
-    feature_columns = features.columns.tolist()
-
-    del original
     del cleaned
-    del features
-    del target
 
-    return feature_columns
+    print(f"{dataset_name} feature rows: {len(features):,}")
+    print(f"{dataset_name} target rows: {len(target):,}")
+
+    return features, target
 
 
 def main() -> int:
-    """Run dataset loading, basic cleaning, and consistency checks."""
+    """Execute dataset preparation and feature engineering."""
     print("=" * 72)
     print("AI-POWERED CYBERSECURITY THREAT DETECTION SYSTEM")
-    print("Step 6: Data Cleaning and Preprocessing")
+    print("Step 7: Feature Engineering")
     print("=" * 72)
 
     try:
-        training_columns = inspect_dataset(
+        X_train, y_train = load_and_prepare_dataset(
             "Training dataset",
             TRAINING_PATH,
         )
 
-        testing_columns = inspect_dataset(
+        X_test, y_test = load_and_prepare_dataset(
             "Testing dataset",
             TESTING_PATH,
         )
 
+        # Validate label distributions without fitting any model.
+        print("\nTraining target distribution:")
+        print(y_train.value_counts().sort_index().to_string())
+
+        print("\nTesting target distribution:")
+        print(y_test.value_counts().sort_index().to_string())
+
+        (
+            transformer,
+            transformed_training,
+            transformed_testing,
+            numerical_columns,
+            categorical_columns,
+        ) = engineer_features(
+            training_features=X_train,
+            testing_features=X_test,
+        )
+
+        feature_names = transformer.get_feature_names_out()
+
+        print_feature_engineering_summary(
+            training_features=X_train,
+            testing_features=X_test,
+            transformed_training=transformed_training,
+            transformed_testing=transformed_testing,
+            numerical_columns=numerical_columns,
+            categorical_columns=categorical_columns,
+            transformed_feature_names=feature_names,
+        )
+
+        print("\nSUCCESS: Feature engineering completed.")
+        print("The transformation was fitted on training data only.")
+        print(
+            "No classifier or anomaly-detection model has been trained "
+            "in this step."
+        )
+
     except (OSError, ValueError, TypeError) as error:
-        print("\nERROR: Dataset preprocessing could not be completed.")
+        print("\nERROR: Feature engineering could not be completed.")
         print(error)
         return 1
 
-    training_set = set(training_columns)
-    testing_set = set(testing_columns)
-
-    missing_from_test = sorted(training_set - testing_set)
-    extra_in_test = sorted(testing_set - training_set)
-
-    if missing_from_test or extra_in_test:
-        print("\nERROR: Training and testing feature columns do not match.")
-
-        if missing_from_test:
-            print(f"Missing from testing dataset: {missing_from_test}")
-
-        if extra_in_test:
-            print(f"Additional testing columns: {extra_in_test}")
-
-        print(
-            "Resolve the schema mismatch before training so that "
-            "both datasets use consistent features."
-        )
-        return 1
-
-    if training_columns != testing_columns:
-        print(
-            "\nFeature names match, but their order differs. "
-            "The testing dataset will need to be aligned to training "
-            "feature order when the model pipeline is implemented."
-        )
-    else:
-        print("\nTraining and testing feature names and order match.")
-
-    print("\nSUCCESS: Dataset cleaning and validation completed.")
-    print("Rows were not automatically deleted.")
-    print("No machine-learning model has been trained in this step.")
+    finally:
+        # Release loaded feature frames and label series when possible.
+        for variable_name in (
+            "X_train",
+            "X_test",
+            "y_train",
+            "y_test",
+        ):
+            if variable_name in locals():
+                del locals()[variable_name]
 
     return 0
 
